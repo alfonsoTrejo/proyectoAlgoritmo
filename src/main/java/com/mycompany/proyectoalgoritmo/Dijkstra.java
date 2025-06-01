@@ -1,3 +1,4 @@
+package com.mycompany.proyectoalgoritmo;
 import java.util.Arrays;
 
 public class Dijkstra {
