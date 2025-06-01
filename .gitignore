@@ -1,0 +1,31 @@
+# Ignorar carpeta de compilación de Maven/Gradle
+target/
+
+# Ignorar archivos .class
+*.class
+
+# Ignorar paquetes temporales de Eclipse/IntelliJ
+bin/
+out/
+
+# Ignorar configuración de IDEs
+*.iml
+.idea/
+*.ipr
+*.iws
+*.classpath
+*.project
+*.settings/
+
+# Ignorar logs y archivos generados
+*.log
+*.tmp
+
+# Ignorar archivos de empaquetado
+*.jar
+*.war
+*.ear
+
+# Ignorar archivos OS específicos
+.DS_Store
+Thumbs.db
