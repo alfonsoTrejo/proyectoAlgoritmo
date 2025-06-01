@@ -536,6 +536,7 @@ public class InterfazGrafica extends JFrame {
         return contenido.toString();
     }
     
+    //CAMBIEN AQUI LA RUTA PARA QUE LES LEA EL CSV"
     private void cargarLaberintoTexto() {
         String rutaArchivo = "C:\\Users\\rauli\\Desktop\\ALGORITMOS\\ProyectoFinal\\proyectoAlgoritmo-main\\src\\main\\java\\com\\mycompany\\proyectoalgoritmo\\laberintoTEXT";
         File archivo = new File(rutaArchivo);
