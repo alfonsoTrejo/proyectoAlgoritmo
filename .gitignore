@@ -3,6 +3,7 @@ target/
 
 # Ignorar archivos .class
 *.class
+*.csv
 
 # Ignorar paquetes temporales de Eclipse/IntelliJ
 bin/
