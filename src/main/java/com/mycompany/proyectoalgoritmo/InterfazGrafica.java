@@ -397,12 +397,12 @@ public class InterfazGrafica extends JFrame {
 
         // Ejecutar BFS si está seleccionado
         if (btnBFS.getBackground().equals(new Color(70, 130, 180))) {
-            long t0 = System.currentTimeMillis();
+            long t0 = System.nanoTime();
             List<Integer> rutaBFS = BFS.bfs(adjListActual, inicio, meta);
-            long t1 = System.currentTimeMillis();
+            long t1 = System.nanoTime();
             long tiempo = t1 - t0;
             if (rutaBFS.isEmpty()) {
-                textAreaTiempos.append("BFS: No encontró ruta. Tiempo = " + tiempo + " ms\n");
+                textAreaTiempos.append("BFS: No encontró ruta. Tiempo = " + tiempo + " ns\n");
             } else {
                 textAreaTiempos.append("BFS: Ruta = " + rutaBFS +
                     " (pasos=" + (rutaBFS.size() - 1) + ") " +
@@ -412,15 +412,15 @@ public class InterfazGrafica extends JFrame {
 
         // Ejecutar Dijkstra si está seleccionado
         if (btnDijkstra.getBackground().equals(new Color(70, 130, 180))) {
-            long t0 = System.currentTimeMillis();
+            long t0 = System.nanoTime();
             Map<String, Object> resDij = Dijkstra.dijkstra(adjListActual, inicio, meta);
-            long t1 = System.currentTimeMillis();
+            long t1 = System.nanoTime();
             long tiempo = t1 - t0;
             @SuppressWarnings("unchecked")
             List<Integer> rutaDij = (List<Integer>) resDij.get("path");
             int distDij = (Integer) resDij.get("dist");
             if (rutaDij.isEmpty()) {
-                textAreaTiempos.append("Dijkstra: No encontró ruta. Tiempo = " + tiempo + " ms\n");
+                textAreaTiempos.append("Dijkstra: No encontró ruta. Tiempo = " + tiempo + " ns\n");
             } else {
                 textAreaTiempos.append("Dijkstra: Ruta = " + rutaDij +
                     " (dist=" + distDij + ") " +
@@ -430,12 +430,12 @@ public class InterfazGrafica extends JFrame {
 
         // Ejecutar A* si está seleccionado
         if (btnAStar.getBackground().equals(new Color(70, 130, 180))) {
-            long t0 = System.currentTimeMillis();
+            long t0 = System.nanoTime();
             List<Integer> rutaAStar = AStar.aStarSearch(adjListActual, inicio, meta, filasActual, colsActual);
-            long t1 = System.currentTimeMillis();
+            long t1 = System.nanoTime();
             long tiempo = t1 - t0;
             if (rutaAStar.isEmpty()) {
-                textAreaTiempos.append("A*: No encontró ruta. Tiempo = " + tiempo + " ms\n");
+                textAreaTiempos.append("A*: No encontró ruta. Tiempo = " + tiempo + " ns\n");
             } else {
                 textAreaTiempos.append("A*: Ruta = " + rutaAStar +
                     " (pasos=" + (rutaAStar.size() - 1) + ") " +
