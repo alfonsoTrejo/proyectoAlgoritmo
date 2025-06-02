@@ -234,48 +234,7 @@ public class InterfazGrafica extends JFrame {
         actualizarTiempos("Listo para ejecutar algoritmos\n\n");
     }
 
-    private void cargarLaberintoTexto() {
-        String ruta = "C:\\Users\\rauli\\Desktop\\ALGORITMOS\\ProyectoFinal\\proyectoAlgoritmo-main\\src\\main\\java\\com\\mycompany\\proyectoalgoritmo\\laberintoTEXT.csv";
-        File file = new File(ruta);
-        if (!file.exists()) {
-            actualizarTiempos("Error: No se encontró laberintoTEXT.csv en la ruta especificada\n");
-            textAreaContenido.setText("Error: laberintoTEXT.csv no encontrado en:\n" + ruta);
-            return;
-        }
-
-        try {
-            String contenido = leerContenidoArchivo(ruta);
-            textAreaContenido.setText("=== CONTENIDO DE laberintoTEXT.csv ===\n" + contenido);
-            textAreaContenido.setCaretPosition(0);
-        } catch (IOException ex) {
-            actualizarTiempos("Error al leer laberintoTEXT.csv: " + ex.getMessage() + "\n");
-            return;
-        }
-
-        List<List<Integer>> lista = CSVReader.castCSVtoList(ruta);
-        if (lista == null) {
-            actualizarTiempos("Error: laberintoTEXT.csv no tiene formato válido\n");
-            return;
-        }
-        filasActual = CSVReader.rows;
-        colsActual = CSVReader.columns;
-        adjListActual = lista;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== LISTA DE ADYACENCIA DE laberintoTEXT ===\n");
-        sb.append("Dimensiones: ").append(filasActual).append("x").append(colsActual)
-          .append(" (Total nodos=").append(adjListActual.size()).append(")\n\n");
-        for (int i = 0; i < adjListActual.size(); i++) {
-            sb.append(i).append(": ").append(adjListActual.get(i)).append("\n");
-        }
-        textAreaContenido.setText(sb.toString());
-        textAreaContenido.setCaretPosition(0);
-
-        actualizarTiempos("laberintoTEXT.csv cargado exitosamente\n");
-        actualizarTiempos("Dimensiones: " + filasActual + "x" + colsActual + "\n");
-        actualizarTiempos("Listo para ejecutar algoritmos\n\n");
-    }
-
+ 
     private void crearGrafoManual() {
         String dims = JOptionPane.showInputDialog(this,
             "Ingrese dimensiones (filas,columnas) para grafo manual, ej: 3,3:",
