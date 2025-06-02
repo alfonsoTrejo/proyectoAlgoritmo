@@ -2,59 +2,94 @@ package com.mycompany.proyectoalgoritmo;
 
 import java.util.*;
 
+/**
+ * Implementación de A* que utiliza lista de adyacencia (List<List<Integer>>)
+ * en un grafo no ponderado (peso = 1) organizado sobre una cuadrícula de filas×cols.
+ */
 public class AStar {
 
-    public static List<Node> aStarSearch(Node start, Node goal, Map<Node, Map<Node, Integer>> graph) {
-        Set<Node> closedSet = new HashSet<>();
-        PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(Node::getF));
+    /**
+     * Ejecuta A* Search usando lista de adyacencia.
+     *
+     * @param adjList Lista de adyacencia; adjList.get(u) es la lista de vecinos de u.
+     * @param start   Índice del nodo de inicio (0 ≤ start < filas*cols).
+     * @param goal    Índice del nodo objetivo (0 ≤ goal < filas*cols).
+     * @param filas   Número de filas en la cuadrícula.
+     * @param cols    Número de columnas en la cuadrícula.
+     * @return Ruta (List<Integer>) desde start hasta goal; lista vacía si no existe camino.
+     */
+    public static List<Integer> aStarSearch(List<List<Integer>> adjList, int start, int goal, int filas, int cols) {
+        int n = adjList.size();
+        // gScore[u] = costo desde start hasta u; fScore[u] = gScore[u] + heurística(u, goal)
+        double[] gScore = new double[n];
+        double[] fScore = new double[n];
+        int[] parent = new int[n];
+        boolean[] closedSet = new boolean[n];
 
-        start.setG(0);
-        start.setF(start.getG() + heuristic(start, goal));
-        openSet.add(start);
+        Arrays.fill(gScore, Double.POSITIVE_INFINITY);
+        Arrays.fill(fScore, Double.POSITIVE_INFINITY);
+        Arrays.fill(parent, -1);
 
-        while (!openSet.isEmpty()) {
-            Node current = openSet.poll();
+        // Comparador para la cola prioritaria basado en fScore
+        PriorityQueue<int[]> openPQ = new PriorityQueue<>(Comparator.comparingDouble(a -> a[1]));
 
-            if (current.equals(goal)) {
-                return reconstructPath(current);
+        gScore[start] = 0;
+        fScore[start] = gScore[start] + heuristicManhattan(start, goal, cols);
+        openPQ.add(new int[]{start, (int) fScore[start]});
+
+        while (!openPQ.isEmpty()) {
+            int current = openPQ.poll()[0];
+            if (current == goal) {
+                return reconstructPath(parent, start, goal);
             }
+            closedSet[current] = true;
 
-            closedSet.add(current);
+            // Explorar vecinos de 'current'
+            for (int neighbor : adjList.get(current)) {
+                if (closedSet[neighbor]) continue;
 
-            for (Node neighbor : graph.getOrDefault(current, new HashMap<>()).keySet()) {
-                if (closedSet.contains(neighbor)) continue;
-
-                double tentativeG = current.getG() + graph.get(current).get(neighbor);
-
-                if (tentativeG < neighbor.getG()) {
-                    neighbor.setParent(current);
-                    neighbor.setG(tentativeG);
-                    neighbor.setH(heuristic(neighbor, goal));
-                    neighbor.setF(neighbor.getG() + neighbor.getH());
-
-                    if (!openSet.contains(neighbor)) {
-                        openSet.add(neighbor);
-                    }
+                double tentativeG = gScore[current] + 1; // peso = 1
+                if (tentativeG < gScore[neighbor]) {
+                    parent[neighbor] = current;
+                    gScore[neighbor] = tentativeG;
+                    fScore[neighbor] = tentativeG + heuristicManhattan(neighbor, goal, cols);
+                    openPQ.add(new int[]{neighbor, (int) fScore[neighbor]});
                 }
             }
         }
 
-        return Collections.emptyList(); // No hay camino
+        // No se encontró camino
+        return Collections.emptyList();
     }
 
-    private static List<Node> reconstructPath(Node current) {
-        List<Node> path = new ArrayList<>();
-        while (current != null) {
-            path.add(current);
-            current = current.getParent();
+    /**
+     * Heurística Manhattan para índices en cuadrícula filas×cols.
+     * @param idxNodo Índice de la celda actual.
+     * @param idxMeta Índice de la celda objetivo.
+     * @param cols    Número de columnas para convertir índice→(fila,columna).
+     * @return Distancia Manhattan entre idxNodo y idxMeta.
+     */
+    private static int heuristicManhattan(int idxNodo, int idxMeta, int cols) {
+        int fila1 = idxNodo / cols;
+        int col1 = idxNodo % cols;
+        int fila2 = idxMeta / cols;
+        int col2 = idxMeta % cols;
+        return Math.abs(fila1 - fila2) + Math.abs(col1 - col2);
+    }
+
+    /**
+     * Reconstruye la ruta desde 'start' hasta 'goal' usando el array 'parent'.
+     */
+    private static List<Integer> reconstructPath(int[] parent, int start, int goal) {
+        List<Integer> path = new ArrayList<>();
+        for (int at = goal; at != -1; at = parent[at]) {
+            path.add(at);
+            if (at == start) break;
         }
         Collections.reverse(path);
-        return path;
-    }
-
-    // Si tienes coordenadas (x, y), usa eso aquí. Si no, puedes dejarlo en 0.
-    private static double heuristic(Node a, Node b) {
-        // return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY()); // Manhattan
-        return 0; // Heurística nula (Dijkstra)
+        if (!path.isEmpty() && path.get(0) == start) {
+            return path;
+        }
+        return Collections.emptyList();
     }
 }
