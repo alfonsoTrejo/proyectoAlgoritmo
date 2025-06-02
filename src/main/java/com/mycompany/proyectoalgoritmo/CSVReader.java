@@ -15,8 +15,12 @@ public class CSVReader {
      *
      * Nota: NO agregamos la arista inversa aquí. Se asume que el CSV ya define ambas direcciones.
      */
+    public static int rows;
+    public static int columns;
+    public static List<List<Integer>> adjList;
+
     public static List<List<Integer>> castCSVtoList(String filePath) {
-        List<List<Integer>> listaAdyacencia = null;
+        List<List<Integer>> adjList  = null;
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             // Leer primera línea con dimensiones "filas,columnas"
@@ -26,14 +30,14 @@ public class CSVReader {
             }
             line = line.replaceAll("\"", "").trim();
             String[] dimensions = line.split(",");
-            int filas = Integer.parseInt(dimensions[0].trim());
-            int columnas = Integer.parseInt(dimensions[1].trim());
-            int totalNodes = filas * columnas;
+            rows = Integer.parseInt(dimensions[0].trim());
+            columns = Integer.parseInt(dimensions[1].trim());
+            int totalNodes = rows * columns;
 
             // Inicializar lista de adyacencia con "totalNodes" listas vacías
-            listaAdyacencia = new ArrayList<>(totalNodes);
+            adjList  = new ArrayList<>(totalNodes);
             for (int i = 0; i < totalNodes; i++) {
-                listaAdyacencia.add(new ArrayList<>());
+                adjList .add(new ArrayList<>());
             }
 
             // Leer el resto de líneas para poblar la lista de adyacencia
@@ -57,8 +61,8 @@ public class CSVReader {
                     // Validar rango
                     if (nodo >= 0 && nodo < totalNodes && vecino >= 0 && vecino < totalNodes) {
                         // Solo agregamos la arista en la dirección indicada por el CSV.
-                        // NO hacemos listaAdyacencia.get(vecino).add(nodo);
-                        listaAdyacencia.get(nodo).add(vecino);
+                        // NO hacemos adjList .get(vecino).add(nodo);
+                        adjList .get(nodo).add(vecino);
                     }
                 }
             }
@@ -69,7 +73,7 @@ public class CSVReader {
             System.err.println("Error al parsear número: " + e.getMessage());
         }
 
-        return listaAdyacencia;
+        return adjList ;
     }
 
     /**

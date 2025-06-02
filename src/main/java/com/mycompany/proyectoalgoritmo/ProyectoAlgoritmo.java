@@ -2,8 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 package com.mycompany.proyectoalgoritmo;
-import javax.swing.UIManager;
-import javax.swing.*;
+
 /**
  *
  * @author trejo
