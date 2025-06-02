@@ -1,87 +1,104 @@
 package com.mycompany.proyectoalgoritmo;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CSVReader {
-    public static int[][] castCSVtoMatrix(String filePath) {
-        int[][] matrix = null;
+
+    /**
+     * Lee el CSV y retorna la lista de adyacencia:
+     *  - El primer renglón indica "filas,columnas".
+     *  - A partir del segundo renglón: "nodo:vecino1,vecino2,...".
+     *
+     * Nota: NO agregamos la arista inversa aquí. Se asume que el CSV ya define ambas direcciones.
+     */
+    public static List<List<Integer>> castCSVtoList(String filePath) {
+        List<List<Integer>> listaAdyacencia = null;
+
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // Get dimension from the first line
+            // Leer primera línea con dimensiones "filas,columnas"
             String line = br.readLine();
-            
-            // Limpiar la línea de comillas y espacios
+            if (line == null) {
+                throw new IOException("El archivo está vacío");
+            }
             line = line.replaceAll("\"", "").trim();
             String[] dimensions = line.split(",");
-            int rows = Integer.parseInt(dimensions[0].trim());
-            int columns = Integer.parseInt(dimensions[1].trim());
-            int totalNodes = rows * columns;
-            
-            // Initialize matrix
-            matrix = new int[totalNodes][totalNodes];
-            
-            // Read CSV from the second line onwards
+            int filas = Integer.parseInt(dimensions[0].trim());
+            int columnas = Integer.parseInt(dimensions[1].trim());
+            int totalNodes = filas * columnas;
+
+            // Inicializar lista de adyacencia con "totalNodes" listas vacías
+            listaAdyacencia = new ArrayList<>(totalNodes);
+            for (int i = 0; i < totalNodes; i++) {
+                listaAdyacencia.add(new ArrayList<>());
+            }
+
+            // Leer el resto de líneas para poblar la lista de adyacencia
             String row;
             while ((row = br.readLine()) != null) {
-                if (row.isEmpty()) continue;
-                
-                // Limpiar la línea de comillas y espacios extra
                 row = row.replaceAll("\"", "").trim();
-                
-                // Split by comma to get all values in the row
-                String[] values = row.split(",");
-                
-                if (values.length < 2) continue;
-                
-                // First value is the node
-                String nodeStr = values[0].trim();
-                if (nodeStr.isEmpty()) continue;
-                
-                int node = Integer.parseInt(nodeStr);
-                
-                // Rest of the values are the neighbors
-                for (int i = 1; i < values.length; i++) {
-                    String neighborStr = values[i].trim();
-                    if (!neighborStr.isEmpty()) {
-                        int neighbor = Integer.parseInt(neighborStr);
-                        
-                        // Verificar que los índices estén dentro del rango
-                        if (node < totalNodes && neighbor < totalNodes && node >= 0 && neighbor >= 0) {
-                            matrix[node][neighbor] = 1;
-                            matrix[neighbor][node] = 1; // Make it bidirectional
-                        }
+                if (row.isEmpty()) continue;
+
+                // Formato esperado: "nodo:vecino1,vecino2,..."
+                String[] partes = row.split(":");
+                if (partes.length < 2) continue;
+
+                int nodo = Integer.parseInt(partes[0].trim());
+                String[] vecinos = partes[1].split(",");
+
+                for (String vStr : vecinos) {
+                    vStr = vStr.trim();
+                    if (vStr.isEmpty()) continue;
+
+                    int vecino = Integer.parseInt(vStr);
+                    // Validar rango
+                    if (nodo >= 0 && nodo < totalNodes && vecino >= 0 && vecino < totalNodes) {
+                        // Solo agregamos la arista en la dirección indicada por el CSV.
+                        // NO hacemos listaAdyacencia.get(vecino).add(nodo);
+                        listaAdyacencia.get(nodo).add(vecino);
                     }
                 }
             }
-            
+
         } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+            System.err.println("Error leyendo CSV: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.err.println("Error parsing number: " + e.getMessage());
+            System.err.println("Error al parsear número: " + e.getMessage());
         }
-        return matrix;
+
+        return listaAdyacencia;
     }
-    
-    public static void printCSV(String filePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {}
-    }
-    
-    public static void printMatrix(int[][] matrix) {
-        if (matrix == null) {
-            System.out.println("La matriz es null");
+
+    /**
+     * Imprime por consola cada entrada de la lista de adyacencia:
+     * 0: [1, 3]
+     * 1: [0, 2, 4]
+     * ...
+     */
+    public static void printAdjList(List<List<Integer>> listaAdy) {
+        if (listaAdy == null) {
+            System.out.println("La lista de adyacencia es null");
             return;
         }
-        
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j] + " ");
-            }
-            System.out.println();
+        for (int i = 0; i < listaAdy.size(); i++) {
+            System.out.println(i + ": " + listaAdy.get(i));
+        }
+    }
+
+    // main para probar el lector
+    public static void main(String[] args) {
+        String filePath =
+            "C:\\Users\\trejo\\OneDrive\\Documentos\\NetBeansProjects\\proyectoAlgoritmo\\"
+            + "src\\main\\java\\com\\mycompany\\proyectoalgoritmo\\ejemp;o.csv";
+
+        List<List<Integer>> adjList = castCSVtoList(filePath);
+        if (adjList != null) {
+            printAdjList(adjList);
+        } else {
+            System.out.println("No se pudo crear la lista de adyacencia desde el CSV.");
         }
     }
 }
