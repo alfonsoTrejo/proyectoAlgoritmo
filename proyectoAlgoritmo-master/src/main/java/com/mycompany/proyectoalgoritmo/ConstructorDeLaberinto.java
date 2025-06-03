@@ -174,7 +174,7 @@ public class ConstructorDeLaberinto extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             
             int cellSize = Math.min(getWidth() / columnas, getHeight() / filas);
-            cellSize = Math.max(20, cellSize); // Tamaño mínimo de celda
+            cellSize = Math.max(20, cellSize); 
             
             int offsetX = (getWidth() - columnas * cellSize) / 2;
             int offsetY = (getHeight() - filas * cellSize) / 2;
@@ -245,8 +245,8 @@ public class ConstructorDeLaberinto extends JFrame {
             int x = offsetX + col * cellSize;
             int y = offsetY + fila * cellSize;
             
-            // Hacer los círculos más pequeños
-            int circleSize = Math.max(8, cellSize / 3); // Más pequeño que antes
+            
+            int circleSize = Math.max(8, cellSize / 3); 
             int margin = (cellSize - circleSize) / 2;
             
             g2d.setColor(color);
@@ -264,23 +264,23 @@ public class ConstructorDeLaberinto extends JFrame {
                                    int offsetX, int offsetY, String algoritmo) {
             if (ruta.size() < 2) return;
             
-            // Determinar color de la solución según el algoritmo
+            /
             Color colorSolucion;
             switch (algoritmo.toUpperCase()) {
                 case "BFS":
-                    colorSolucion = Color.GREEN; // Verde
+                    colorSolucion = Color.GREEN; 
                     break;
                 case "DIJKSTRA":
-                    colorSolucion = Color.BLUE; // Azul
+                    colorSolucion = Color.BLUE; 
                     break;
                 case "A*":
-                    colorSolucion = Color.ORANGE; // Naranja
+                    colorSolucion = Color.ORANGE; 
                     break;
                 default:
                     colorSolucion = Color.BLUE;
             }
             
-            // Si es el algoritmo óptimo, usar rojo para destacarlo
+           
             String mejorAlgoritmo = labelOptimo.getText();
             if (mejorAlgoritmo.contains(algoritmo)) {
                 colorSolucion = Color.RED;
@@ -311,7 +311,7 @@ public class ConstructorDeLaberinto extends JFrame {
      
             g2d.setColor(colorSolucion.darker());
             for (int nodo : ruta) {
-                if (nodo != 0 && nodo != totalNodos - 1) { // No sobrescribir inicio y fin
+                if (nodo != 0 && nodo != totalNodos - 1) {
                     int fila = nodo / columnas;
                     int col = nodo % columnas;
                     
