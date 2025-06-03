@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.mycompany.proyectoalgoritmo;
 
 import javax.swing.*;
@@ -63,7 +60,6 @@ public class ConstructorDeLaberinto extends JFrame {
         panelControles.setBackground(new Color(240, 240, 240));
         panelControles.setBorder(BorderFactory.createTitledBorder("Visualización de Algoritmos"));
         
-        // ComboBox para seleccionar algoritmo a mostrar
         comboAlgoritmos = new JComboBox<>();
         comboAlgoritmos.addItem("Laberinto Original");
         for (String algoritmo : resultados.keySet()) {
@@ -98,8 +94,7 @@ public class ConstructorDeLaberinto extends JFrame {
         JScrollPane scrollPane = new JScrollPane(panelLaberinto);
         scrollPane.setPreferredSize(new Dimension(800, 600));
         add(scrollPane, BorderLayout.CENTER);
-        
-        // Panel de leyenda actualizada con los nuevos colores
+
         JPanel panelLeyenda = new JPanel(new FlowLayout());
         panelLeyenda.setBackground(new Color(250, 250, 250));
         panelLeyenda.setBorder(BorderFactory.createTitledBorder("Leyenda"));
@@ -184,10 +179,10 @@ public class ConstructorDeLaberinto extends JFrame {
             int offsetX = (getWidth() - columnas * cellSize) / 2;
             int offsetY = (getHeight() - filas * cellSize) / 2;
             
-            // Dibujar el laberinto base
+       
             dibujarLaberinto(g2d, cellSize, offsetX, offsetY);
             
-            // Dibujar la solución si hay una seleccionada
+           
             String algoritmoSeleccionado = (String) comboAlgoritmos.getSelectedItem();
             if (!"Laberinto Original".equals(algoritmoSeleccionado)) {
                 ResultadoAlgoritmo resultado = resultados.get(algoritmoSeleccionado);
@@ -212,24 +207,24 @@ public class ConstructorDeLaberinto extends JFrame {
                 int x = offsetX + col * cellSize;
                 int y = offsetY + fila * cellSize;
                 
-                // Dibujar la celda
+              
                 g2d.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
                 
-                // Dibujar conexiones como pasillos
+                
                 for (int vecino : adjList.get(nodo)) {
                     int filaVecino = vecino / columnas;
                     int colVecino = vecino % columnas;
                     
-                    // Solo dibujar si es un vecino adyacente válido
+                
                     if (Math.abs(fila - filaVecino) + Math.abs(col - colVecino) == 1) {
                         int xVecino = offsetX + colVecino * cellSize;
                         int yVecino = offsetY + filaVecino * cellSize;
                         
-                        // Dibujar pasillo entre celdas
-                        if (fila == filaVecino) { // Movimiento horizontal
+                 
+                        if (fila == filaVecino) { 
                             int minX = Math.min(x, xVecino);
                             g2d.fillRect(minX + cellSize - 1, y + 1, 2, cellSize - 2);
-                        } else { // Movimiento vertical
+                        } else { 
                             int minY = Math.min(y, yVecino);
                             g2d.fillRect(x + 1, minY + cellSize - 1, cellSize - 2, 2);
                         }

@@ -17,7 +17,7 @@ public class CSVReader {
         List<List<Integer>> adjList  = null;
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // Leer primera línea con dimensiones "filas,columnas"
+            
             String line = br.readLine();
             if (line == null) {
                 throw new IOException("El archivo está vacío");
@@ -34,13 +34,13 @@ public class CSVReader {
                 adjList .add(new ArrayList<>());
             }
 
-            // Leer el resto de líneas para poblar la lista de adyacencia
+            
             String row;
             while ((row = br.readLine()) != null) {
                 row = row.replaceAll("\"", "").trim();
                 if (row.isEmpty()) continue;
 
-                // Formato esperado: "nodo:vecino1,vecino2,..."
+                // Formato correcto: nodo:vecino1,vecino2
                 String[] partes = row.split(":");
                 if (partes.length < 2) continue;
 
@@ -52,10 +52,9 @@ public class CSVReader {
                     if (vStr.isEmpty()) continue;
 
                     int vecino = Integer.parseInt(vStr);
-                    // Validar rango
+                  
                     if (nodo >= 0 && nodo < totalNodes && vecino >= 0 && vecino < totalNodes) {
-                        // Solo agregamos la arista en la dirección indicada por el CSV.
-                        // NO hacemos adjList .get(vecino).add(nodo);
+                       
                         adjList .get(nodo).add(vecino);
                     }
                 }

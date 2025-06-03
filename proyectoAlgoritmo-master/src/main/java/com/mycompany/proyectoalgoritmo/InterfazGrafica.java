@@ -196,7 +196,7 @@ public class InterfazGrafica extends JFrame {
         File file = fileChooser.getSelectedFile();
         String ruta = file.getAbsolutePath();
 
-        // 1) Leer y mostrar contenido crudo
+        
         try {
             String contenido = leerContenidoArchivo(ruta);
             textAreaContenido.setText(" CONTENIDO DEL ARCHIVO CSV \n" + contenido);
@@ -216,7 +216,7 @@ public class InterfazGrafica extends JFrame {
         colsActual = CSVReader.columns;
         adjListActual = lista;
 
-        // 3) Mostrar la lista de adyacencia
+        // MOSTRAR LA LISTA DE ADYACENCIA
         StringBuilder sb = new StringBuilder();
         sb.append(" LISTA DE ADYACENCIA GENERADA \n");
         sb.append("Dimensiones: ").append(filasActual).append("x").append(colsActual)
@@ -232,7 +232,7 @@ public class InterfazGrafica extends JFrame {
         actualizarTiempos("Listo para ejecutar algoritmos\n\n");
     }
 
-    private void crearGrafoManual() {
+  private void crearGrafoManual() {
         String dims = JOptionPane.showInputDialog(this,
             "Ingrese dimensiones (filas,columnas) para grafo manual, ej: 3,3:",
             "Grafo Manual", JOptionPane.QUESTION_MESSAGE);
@@ -246,14 +246,34 @@ public class InterfazGrafica extends JFrame {
 
             JTextArea inputArea = new JTextArea(15, 40);
             inputArea.setFont(new Font("Courier New", Font.PLAIN, 12));
-            inputArea.setText("Ingrese conexiones (nodo:vecino1,vecino2,...)\n" +
-                "Nodos válidos: 0 a " + (totalNodos - 1) + "\n\n");
+            
+            // Texto inicial sin ejemplos
+            StringBuilder textoInicial = new StringBuilder();
+            textoInicial.append("Para un grafo ").append(filas).append("x").append(cols);
+            textoInicial.append(" los nodos válidos son: 0 a ").append(totalNodos - 1).append("\n\n");
+            textoInicial.append("Ingrese sus conexiones usando el formato: nodo:vecinos\n");
+            textoInicial.append("Ejemplo: 0:1,3 significa que nodo 0 conecta con 1 y 3\n\n");
+            
+            inputArea.setText(textoInicial.toString());
 
             JScrollPane scrollPane = new JScrollPane(inputArea);
-            scrollPane.setPreferredSize(new Dimension(500, 300));
+            scrollPane.setPreferredSize(new Dimension(600, 350));
 
-            int res = JOptionPane.showConfirmDialog(this, scrollPane,
-                "Definir Conexiones del Grafo Manual", JOptionPane.OK_CANCEL_OPTION);
+            // Crear panel con instrucciones adicionales
+            JPanel panelCompleto = new JPanel(new BorderLayout());
+            
+            JLabel instruccionesLabel = new JLabel("<html><b>INSTRUCCIONES:</b><br>" +
+                "• Use el formato: nodo:vecinos (separados por comas)<br>" +
+                "• Una conexión por línea<br>" +
+                "• Ejemplo: 0:1,3 conecta el nodo 0 con los nodos 1 y 3</html>");
+            instruccionesLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            
+            panelCompleto.add(instruccionesLabel, BorderLayout.NORTH);
+            panelCompleto.add(scrollPane, BorderLayout.CENTER);
+
+            int res = JOptionPane.showConfirmDialog(this, panelCompleto,
+                "Definir Conexiones del Grafo Manual - Formato: nodo:vecinos", 
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
             if (res != JOptionPane.OK_OPTION) return;
 
             List<List<Integer>> nuevaAdj = new ArrayList<>(totalNodos);
@@ -261,19 +281,47 @@ public class InterfazGrafica extends JFrame {
                 nuevaAdj.add(new ArrayList<>());
             }
 
-            for (String line : inputArea.getText().split("\n")) {
+            String textoIngresado = inputArea.getText();
+            String[] lineas = textoIngresado.split("\n");
+            
+            for (String line : lineas) {
                 line = line.trim();
-                if (line.isEmpty() || line.startsWith("Ingrese")) continue;
-                String[] partesLinea = line.split(":");
-                if (partesLinea.length < 2) continue;
-                int nodo = Integer.parseInt(partesLinea[0].trim());
-                String[] vecinos = partesLinea[1].split(",");
-                for (String vStr : vecinos) {
-                    vStr = vStr.trim();
-                    if (vStr.isEmpty()) continue;
-                    int vec = Integer.parseInt(vStr);
-                    if (nodo >= 0 && nodo < totalNodos && vec >= 0 && vec < totalNodos) {
-                        nuevaAdj.get(nodo).add(vec);
+                // Ignorar líneas informativas y líneas vacías
+                if (line.isEmpty() || 
+                    line.startsWith("Para un grafo") || 
+                    line.startsWith("Ingrese sus conexiones") || 
+                    line.startsWith("Ejemplo:") ||
+                    line.startsWith("los nodos válidos")) {
+                    continue;
+                }
+                
+                // Procesar líneas que contienen conexiones reales
+                if (line.contains(":")) {
+                    try {
+                        String[] partesLinea = line.split(":");
+                        if (partesLinea.length >= 2) {
+                            int nodo = Integer.parseInt(partesLinea[0].trim());
+                            
+                            // Verificar que el nodo esté en rango válido
+                            if (nodo >= 0 && nodo < totalNodos) {
+                                String[] vecinos = partesLinea[1].split(",");
+                                for (String vStr : vecinos) {
+                                    vStr = vStr.trim();
+                                    if (!vStr.isEmpty()) {
+                                        try {
+                                            int vec = Integer.parseInt(vStr);
+                                            if (vec >= 0 && vec < totalNodos && vec != nodo) {
+                                                nuevaAdj.get(nodo).add(vec);
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            // Ignorar vecinos con formato incorrecto
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignorar líneas con formato incorrecto
                     }
                 }
             }
@@ -283,17 +331,24 @@ public class InterfazGrafica extends JFrame {
             adjListActual = nuevaAdj;
 
             StringBuilder sb = new StringBuilder();
-            sb.append(" GRAFO MANUAL \n");
+            sb.append("=== GRAFO MANUAL ===\n");
             sb.append("Dimensiones: ").append(filas).append("x").append(cols)
               .append(" (Total nodos=").append(totalNodos).append(")\n\n");
+            
+            // Mostrar las conexiones creadas
+            int conexionesTotales = 0;
             for (int i = 0; i < adjListActual.size(); i++) {
                 sb.append(i).append(": ").append(adjListActual.get(i)).append("\n");
+                conexionesTotales += adjListActual.get(i).size();
             }
+            
+            sb.append("\nTotal de conexiones: ").append(conexionesTotales).append("\n");
             textAreaContenido.setText(sb.toString());
             textAreaContenido.setCaretPosition(0);
 
             actualizarTiempos("Grafo manual creado\n");
             actualizarTiempos("Dimensiones: " + filas + "x" + cols + "\n");
+            actualizarTiempos("Conexiones: " + conexionesTotales + "\n");
             actualizarTiempos("Listo para ejecutar algoritmos\n\n");
 
         } catch (Exception e) {
@@ -361,15 +416,18 @@ public class InterfazGrafica extends JFrame {
             sb.append(" LABERINTO ALEATORIO \n");
             sb.append("Dimensiones: ").append(filas).append("x").append(cols)
               .append(" (Total nodos=").append(totalNodos).append(")\n\n");
-            for (int i = 0; i < Math.min(10, totalNodos); i++) {
+            
+          //MOSTRAR TODOS LOS NODOS POR MEDIO DEL SCROLL DE LA BARRA SCROLL
+            for (int i = 0; i < totalNodos; i++) {
                 sb.append(i).append(": ").append(adjListActual.get(i)).append("\n");
             }
-            if (totalNodos > 10) sb.append("...\n");
+            
             textAreaContenido.setText(sb.toString());
             textAreaContenido.setCaretPosition(0);
 
             actualizarTiempos("Laberinto aleatorio generado\n");
             actualizarTiempos("Dimensiones: " + filas + "x" + cols + "\n");
+            actualizarTiempos("Total nodos: " + totalNodos + "\n");
             actualizarTiempos("Listo para ejecutar algoritmos\n\n");
 
         } catch (Exception e) {
